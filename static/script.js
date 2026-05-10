@@ -267,10 +267,14 @@ if (isIndexPage) {
     resultsSection.style.display    = "block";
     resultsLoadingEl.style.display  = "none";
     resultsGrid.innerHTML           = "";
+    
+    // Store current projects for reference
+    currentProjects = projects || [];
 
     if (!projects || projects.length === 0) {
       resultsGrid.style.display      = "none";
       resultsEmptyEl.style.display   = "block";
+      showSearchInput(false); // Hide search when no results
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
       resultsSection.scrollIntoView({ behavior: "smooth" });
       return;
@@ -282,6 +286,10 @@ if (isIndexPage) {
     projects.forEach(function (project) {
       resultsGrid.appendChild(buildProjectCard(project));
     });
+
+    // Show search input and setup filter (only once)
+    showSearchInput(true);
+    if (!searchInput) setupFilter();
 
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
@@ -345,6 +353,41 @@ if (isIndexPage) {
   function truncate(text, maxLength) {
     if (!text) return "";
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  }
+
+  // ----------------------------------------------------------
+  // Filter projects based on search input
+  // ----------------------------------------------------------
+  var searchInput = null;
+  var currentProjects = [];
+
+  function setupFilter() {
+    searchInput = document.getElementById("results-search");
+    if (!searchInput) return;
+    
+    searchInput.addEventListener("input", function (e) {
+      var searchTerm = e.target.value.trim().toLowerCase();
+      var cards = resultsGrid.querySelectorAll(".project-card");
+      
+      cards.forEach(function (card) {
+        var title = card.querySelector(".project-card-title")?.textContent.toLowerCase() || "";
+        var desc = card.querySelector(".project-card-desc")?.textContent.toLowerCase() || "";
+        
+        if (searchTerm === "" || title.includes(searchTerm) || desc.includes(searchTerm)) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  }
+
+  function showSearchInput(show) {
+    var wrap = document.getElementById("results-search-wrap");
+    if (wrap) {
+      wrap.style.display = show ? "block" : "none";
+      if (show && searchInput) searchInput.value = "";
+    }
   }
 
 } // end isIndexPage
