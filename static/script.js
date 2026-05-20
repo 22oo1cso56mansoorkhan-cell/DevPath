@@ -603,23 +603,16 @@ if (clearFiltersBtn) {
   //takes the array of projects from the api and draws them on the page as cards
   //if array is empty it shows the "no results" message instead
   function renderResults(projects, message) {
-    resultsSection.style.display    = "block";
-    resultsLoadingEl.style.display  = "none";
-    resultsGrid.innerHTML           = "";
-    
-    // Store current projects for reference
-    currentProjects = projects || [];
+    resultsSection.style.display = "block";
+    resultsLoadingEl.style.display = "none";
+    // Clear out any cards from a previous search before showing new ones
+    resultsGrid.innerHTML = "";
 
     if (!projects || projects.length === 0) {
       resultsGrid.style.display     = "none";
       resultsEmptyEl.style.display  = "block";
       resultsGrid.style.display = "none";
       resultsEmptyEl.style.display = "block";
-      if (message && emptyMessageEl) emptyMessageEl.textContent = message;
-    if (!projects || projects.length === 0) { //if no projects returned from api, show the "no results" message and hide the grid
-    if (!projects || projects.length === 0) {
-      resultsGrid.style.display      = "none";
-      resultsEmptyEl.style.display   = "block";
       showSearchInput(false); // Hide search when no results
       if (message && emptyMessageEl) emptyMessageEl.textContent = message;
       resultsSection.scrollIntoView({ behavior: "smooth" });
@@ -737,15 +730,8 @@ if (clearFiltersBtn) {
           tagTexts += tag.textContent.toLowerCase() + " ";
         });
         
-        // Also specifically look for skill tags (project-tag--skill class)
-        var skillTags = card.querySelectorAll(".project-tag--skill");
-        var skillTexts = "";
-        skillTags.forEach(function(skill) {
-          skillTexts += skill.textContent.toLowerCase() + " ";
-        });
-        
         // Combine all searchable text
-        var searchableText = title + " " + desc + " " + tagTexts + " " + skillTexts;
+        var searchableText = title + " " + desc + " " + tagTexts;
         
         // Check if search term matches ANY content
         if (searchTerm === "" || searchableText.includes(searchTerm)) {
